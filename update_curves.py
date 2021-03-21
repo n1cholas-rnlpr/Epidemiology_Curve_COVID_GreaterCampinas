@@ -16,7 +16,6 @@ locale.setlocale(locale.LC_TIME, 'pt_BR')
 df = pd.read_csv("https://raw.githubusercontent.com/seade-R/dados-covid-sp/master/data/dados_covid_sp.csv", sep=";", decimal=",")
 
 
-
 # Selecionando as observações correspondentes a Campinas.
 dfcps = df[df['codigo_ibge'] == 3509502]
 print(dfcps.shape)
