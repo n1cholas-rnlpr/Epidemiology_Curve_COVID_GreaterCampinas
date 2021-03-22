@@ -104,7 +104,7 @@ if last_obs > todays_date:
 
 
 
-df_ds_gweek['level'] = 'DRS'
+df_ds_gweek['level'] = 'DRS Campinas'
 dfrmc_gweek['level'] = 'RMC'
 dfcps_gweek['level'] = 'Campinas'
 
@@ -118,7 +118,13 @@ dff_casos = dff.loc[:, ['date', 'level', 'newCases']]
 dff_obitos = dff.loc[:, ['date', 'level', 'newDeaths']]
 del dff
 
+dff_casos['labels'] = dff_casos['newCases']
+dates_no_label_casos = dff_casos.loc[(dff_casos['labels'] < 1300) & (dff_casos['level'] == 'DRS Campinas'), 'date'].unique().tolist()
+dff_casos.loc[dff_casos['date'].isin(dates_no_label_casos), 'labels'] = np.nan
 
+dff_obitos['labels'] = dff_obitos['newDeaths']
+dates_no_label_obitos = dff_obitos.loc[(dff_obitos['labels'] < 52) & (dff_obitos['level'] == 'DRS Campinas'), 'date'].unique().tolist()
+dff_obitos.loc[dff_obitos['date'].isin(dates_no_label_obitos), 'labels'] = np.nan
 
 pltblue = '#0072b2'
 pltred = '#d55e00'
@@ -126,12 +132,12 @@ pltgreen = '#009e74'
 
 
 # GRÁFICO NOVOS CASOS
-fig = px.bar(dff_casos, x='date', y='newCases', color='level', text='newCases',
+fig = px.bar(dff_casos, x='date', y='newCases', color='level', text='labels',
              title='<i><b>CURVA EPIDEMIOLÓGICA<br>OBSERVATÓRIO PUC-CAMPINAS | NOVOS CASOS</b></i>',
-             color_discrete_map={'DRS': pltred, 'RMC': pltgreen, 'Campinas': pltblue})
+             color_discrete_map={'DRS Campinas': pltred, 'RMC': pltgreen, 'Campinas': pltblue}, barmode='overlay')
 
 fig.update_layout(
-    margin={'t': 117},
+    margin={'t': 117, 'b': 90},
     xaxis={
         'title': {'text': ''},
         'tickfont': {'size': 22},
@@ -177,6 +183,11 @@ fig.add_layout_image(
     )
 )
 
+fig.add_annotation(text="<b>Fonte: Observatório PUC-Campinas, elaborado por Nícholas R. N. Le Petit, a partir dos dados divulgados pelo SEADE, 2021.</b>",
+ xref='paper', yref='paper', x=0.5, y=-0.09, showarrow=False, font={'size': 14})
+
+fig.update_traces({'marker': {'opacity': 1}})
+
 fig.write_image('latest_casos_curva.png', width=1920, height=1080, scale=3)
 fig.write_image(f"graph_history\\casos_{todays_date.strftime('%d_%m_%y')}.png", width=1920, height=1080, scale=3)
 
@@ -184,12 +195,12 @@ fig.write_image(f"graph_history\\casos_{todays_date.strftime('%d_%m_%y')}.png", 
 
 
 # GRÁFICO NOVOS ÓBITOS
-fig = px.bar(dff_obitos, x='date', y='newDeaths', color='level', text='newDeaths',
+fig = px.bar(dff_obitos, x='date', y='newDeaths', color='level', text='labels',
              title='<i><b>CURVA EPIDEMIOLÓGICA<br>OBSERVATÓRIO PUC-CAMPINAS | NOVOS OBITOS</b></i>',
-             color_discrete_map={'DRS': pltred, 'RMC': pltgreen, 'Campinas': pltblue})
+             color_discrete_map={'DRS Campinas': pltred, 'RMC': pltgreen, 'Campinas': pltblue}, barmode='overlay')
 
 fig.update_layout(
-    margin={'t': 117},
+    margin={'t': 117, 'b': 90},
     xaxis={
         'title': {'text': ''},
         'tickfont': {'size': 22},
@@ -234,6 +245,11 @@ fig.add_layout_image(
         xanchor="right", yanchor="bottom"
     )
 )
+
+fig.add_annotation(text="<b>Fonte: Observatório PUC-Campinas, elaborado por Nícholas R. N. Le Petit, a partir dos dados divulgados pelo SEADE, 2021.</b>",
+ xref='paper', yref='paper', x=0.5, y=-0.09, showarrow=False, font={'size': 14})
+
+fig.update_traces({'marker': {'opacity': 1}})
 
 fig.write_image('latest_obitos_curva.png', width=1920, height=1080, scale=3)
 fig.write_image(f"graph_history\\obitos_{todays_date.strftime('%d_%m_%y')}.png", width=1920, height=1080, scale=3)
